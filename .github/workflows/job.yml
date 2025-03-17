@@ -9,34 +9,38 @@ jobs:
   setup-mysql:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: Moseprek12@
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-timeout=5s --health-retries=3
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install MySQL
+    - name: Wait for MySQL to be ready
       run: |
-        sudo apt update
-        sudo apt install -y mysql-server
+        sleep 30  # Give MySQL time to start
 
-    - name: Start MySQL Service
+    - name: Create Database
       run: |
-        sudo service mysql start
+        sudo mysql -h 127.0.0.1 -P 3306 -u root -p'Moseprek12@' -e "CREATE DATABASE IF NOT EXISTS employees;"
 
-    - name: Create MySQL Database with root user
+    - name: Create Table in the Database
       run: |
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS employees;"
-
-    - name: Create table in the database
-      run: |
-        sudo mysql -e "USE employees; CREATE TABLE IF NOT EXISTS employees (
+        sudo mysql -h 127.0.0.1 -P 3306 -u root -p'Moseprek12@' -e "USE employees; CREATE TABLE IF NOT EXISTS employees (
           id INT AUTO_INCREMENT PRIMARY KEY,
           name VARCHAR(100),
           role VARCHAR(50),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );"
 
-    - name: Seed data into the database
+    - name: Seed Data into the Database
       run: |
-        sudo mysql -e "USE employees; INSERT INTO employees (name, role) VALUES
+        sudo mysql -h 127.0.0.1 -P 3306 -u root -p'Moseprek12@' -e "USE employees; INSERT INTO employees (name, role) VALUES
         ('Altin', 'DevOps Engineer'),
         ('Enis', 'Developer');"
