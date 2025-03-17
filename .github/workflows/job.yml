@@ -23,20 +23,25 @@ jobs:
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Vendos password për root dhe krijo bazën e të dhënave
-    - name: Set MySQL Root Password and Create Database
+    # 3. Krijo një përdorues të ri MySQL dhe vendos fjalëkalimin
+    - name: Create MySQL User and Set Password
       run: |
-        sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Moseprek12@';"
-        sudo mysql -u root -e "FLUSH PRIVILEGES;"
-        sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -e "CREATE USER 'githubuser'@'localhost' IDENTIFIED BY 'Moseprek12@';"
+        sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'githubuser'@'localhost' WITH GRANT OPTION;"
+        sudo mysql -e "FLUSH PRIVILEGES;"
 
-    # 4. Ekzekuto SQL skriptet për krijimin e tabelave dhe futjen e të dhënave
+    # 4. Krijo bazën e të dhënave
+    - name: Create Database
+      run: |
+        sudo mysql -u githubuser -p'Moseprek12@' -e "CREATE DATABASE IF NOT EXISTS my_database;"
+
+    # 5. Ekzekuto SQL skriptet për krijimin e tabelave dhe futjen e të dhënave
     - name: Execute SQL Scripts
       run: |
-        sudo mysql -u root -p'Moseprek12@' my_database < ./01-create-table.sql
-        sudo mysql -u root -p'Moseprek12@' my_database < ./02-seed-data.sql
+        sudo mysql -u githubuser -p'Moseprek12@' my_database < ./01-create-table.sql
+        sudo mysql -u githubuser -p'Moseprek12@' my_database < ./02-seed-data.sql
 
-    # 5. Verifikimi i të dhënave
+    # 6. Verifikimi i të dhënave
     - name: Verify Database Setup
       run: |
-        sudo mysql -u root -p'Moseprek12@' -e "USE my_database; SELECT * FROM employees;"
+        sudo mysql -u githubuser -p'Moseprek12@' -e "USE my_database; SELECT * FROM employees;"
