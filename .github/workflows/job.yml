@@ -22,13 +22,17 @@ jobs:
       run: |
         sudo service mysql start
 
+    - name: Set MySQL root password
+      run: |
+        sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Moseprek12@';"
+
     - name: Create MySQL Database
       run: |
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS employees;"
+        sudo mysql -u root -p'Moseprek12@' -e "CREATE DATABASE IF NOT EXISTS employees;"
 
     - name: Create table in the database
       run: |
-        sudo mysql -e "USE employees; CREATE TABLE IF NOT EXISTS employees (
+        sudo mysql -u root -p'Moseprek12@' -e "USE employees; CREATE TABLE IF NOT EXISTS employees (
           id INT AUTO_INCREMENT PRIMARY KEY,
           name VARCHAR(100),
           role VARCHAR(50),
@@ -37,6 +41,6 @@ jobs:
 
     - name: Seed data into the database
       run: |
-        sudo mysql -e "USE employees; INSERT INTO employees (name, role) VALUES
+        sudo mysql -u root -p'Moseprek12@' -e "USE employees; INSERT INTO employees (name, role) VALUES
         ('Altin', 'DevOps Engineer'),
         ('Enis', 'Developer');"
