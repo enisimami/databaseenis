@@ -1,4 +1,4 @@
-name: MySQL Database Setup
+name: MySQL Database Setup and Upgrade
 
 on:
   push:
@@ -6,45 +6,37 @@ on:
       - main
 
 jobs:
-  setup-mysql:
+  mysql-setup:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.SQL_PASSWORD }}
-          MYSQL_DATABASE: my_database
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }}"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    # 1. Klono repo-n e projektit
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Install MySQL Client
-        run: sudo apt-get install -y mysql-client
+    # 2. Përditëso Ubuntu dhe instalo MySQL
+    - name: Update Ubuntu and Install MySQL
+      run: |
+        sudo apt update -y
+        sudo apt upgrade -y
+        sudo apt install -y mysql-server mysql-client
+        sudo systemctl start mysql
+        sudo systemctl enable mysql
 
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in {60..0}; do
-            if mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} --silent; then
-              break
-            fi
-            echo 'Waiting for MySQL...'
-            sleep 5  # Prit më shumë
-          done
+    # 3. Vendos fjalëkalimin për MySQL root (Nëse nuk ka një fjalëkalim)
+    - name: Set MySQL root password
+      run: |
+        sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Moseprek12@';"
+        sudo mysql -e "FLUSH PRIVILEGES;"
 
-      - name: Run SQL Scripts
-        run: |
-          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} my_database < 01-create-table.sql
-          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} my_database < 02-seed-data.sql
+    # 4. Krijo dhe inicializo bazën e të dhënave me skedarët SQL
+    - name: Create and Seed Database
+      run: |
+        sudo mysql -u root -pMoseprek12@ -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -u root -pMoseprek12@ my_database < ./01-create-table.sql
+        sudo mysql -u root -pMoseprek12@ my_database < ./02-seed-data.sql
 
-      - name: Verify Data
-        run: |
-          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} -e "USE my_database; SELECT * FROM employees;"
+    # 5. Verifiko që të dhënat janë futur në tabelë
+    - name: Verify Database Setup
+      run: |
+        sudo mysql -u root -pMoseprek12@ -e "USE my_database; SELECT * FROM employees;"
