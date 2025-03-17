@@ -23,22 +23,22 @@ jobs:
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Krijo bazën e të dhënave
+    # 3. Krijo bazën e të dhënave 'employees'
     - name: Create Database
       run: |
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -e "CREATE DATABASE IF NOT EXISTS employees;"
 
     # 4. Ekzekuto skriptin për krijimin e tabelës (01-create-table.sql)
     - name: Create Table
       run: |
-        sudo mysql -u root -p'Moseprek12@' my_database < ./01-create-table.sql
+        sudo mysql -u root -p'Moseprek12@' employees < ./01-create-table.sql
 
     # 5. Ekzekuto skriptin për futjen e të dhënave (02-seed-data.sql)
     - name: Seed Data
       run: |
-        sudo mysql -u root -p'Moseprek12@' my_database < ./02-seed-data.sql
+        sudo mysql -u root -p'Moseprek12@' employees < ./02-seed-data.sql
 
     # 6. Verifikimi i të dhënave
     - name: Verify Data in Table
       run: |
-        sudo mysql -u root -p'Moseprek12@' -e "USE my_database; SELECT * FROM employees;"
+        sudo mysql -u root -p'Moseprek12@' -e "USE employees; SELECT * FROM employees;"
