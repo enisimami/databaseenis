@@ -20,11 +20,11 @@ jobs:
 
     - name: Start MySQL service
       run: |
-        sudo service mysql start
+        sudo systemctl start mysql
 
     - name: Create MySQL Database
       run: |
-        sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS employees;"
+        sudo mysql -u root -e "CREATE DATABASE employees;"
 
     - name: Create table in the database
       run: |
@@ -40,3 +40,7 @@ jobs:
         sudo mysql -u root -e "USE employees; INSERT INTO employees (name, role) VALUES
         ('Altin', 'DevOps Engineer'),
         ('Enis', 'Developer');"
+
+    - name: Stop MySQL service
+      run: |
+        sudo systemctl stop mysql
