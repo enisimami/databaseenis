@@ -21,7 +21,7 @@ jobs:
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }}"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=5  # Rrit numrin e provave të shëndetit
 
     steps:
       - name: Checkout repository
@@ -37,7 +37,7 @@ jobs:
               break
             fi
             echo 'Waiting for MySQL...'
-            sleep 1
+            sleep 5  # Prit më shumë
           done
 
       - name: Run SQL Scripts
