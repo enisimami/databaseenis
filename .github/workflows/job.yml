@@ -1,4 +1,4 @@
-name: MySQL Database Setup and Upgrade
+name: MySQL Database Setup and Seed Data
 
 on:
   push:
@@ -23,20 +23,14 @@ jobs:
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Vendos fjalëkalimin për MySQL root (Nëse nuk ka një fjalëkalim)
-    - name: Set MySQL root password
-      run: |
-        sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Moseprek12@';"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-
-    # 4. Krijo dhe inicializo bazën e të dhënave me skedarët SQL
+    # 3. Krijo dhe inicializo bazën e të dhënave me skedarët SQL
     - name: Create and Seed Database
       run: |
-        sudo mysql -u root -pMoseprek12@ -e "CREATE DATABASE IF NOT EXISTS my_database;"
-        sudo mysql -u root -pMoseprek12@ my_database < ./01-create-table.sql
-        sudo mysql -u root -pMoseprek12@ my_database < ./02-seed-data.sql
+        sudo mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -u root -p${{ secrets.MYSQL_PASSWORD }} my_database < ./01-create-table.sql
+        sudo mysql -u root -p${{ secrets.MYSQL_PASSWORD }} my_database < ./02-seed-data.sql
 
-    # 5. Verifiko që të dhënat janë futur në tabelë
+    # 4. Verifiko që të dhënat janë futur në tabelë
     - name: Verify Database Setup
       run: |
-        sudo mysql -u root -pMoseprek12@ -e "USE my_database; SELECT * FROM employees;"
+        sudo mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "USE my_database; SELECT * FROM employees;"
