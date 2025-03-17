@@ -1,4 +1,4 @@
-name: MySQL Setup and Seed Data
+name: MySQL Setup, Create Table, and Seed Data
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v2
 
     # 2. Përditëso Ubuntu dhe instalo MySQL
-    - name: Update Ubuntu and Install MySQL
+    - name: Install MySQL
       run: |
         sudo apt update -y
         sudo apt upgrade -y
@@ -23,25 +23,22 @@ jobs:
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Krijo një përdorues të ri MySQL dhe vendos fjalëkalimin
-    - name: Create MySQL User and Set Password
-      run: |
-        sudo mysql -e "CREATE USER 'githubuser'@'localhost' IDENTIFIED BY 'Moseprek12@';"
-        sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'githubuser'@'localhost' WITH GRANT OPTION;"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-
-    # 4. Krijo bazën e të dhënave
+    # 3. Krijo bazën e të dhënave
     - name: Create Database
       run: |
-        sudo mysql -u githubuser -p'Moseprek12@' -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -e "CREATE DATABASE IF NOT EXISTS my_database;"
 
-    # 5. Ekzekuto SQL skriptet për krijimin e tabelave dhe futjen e të dhënave
-    - name: Execute SQL Scripts
+    # 4. Ekzekuto skriptin për krijimin e tabelës (01-create-table.sql)
+    - name: Create Table
       run: |
-        sudo mysql -u githubuser -p'Moseprek12@' my_database < ./01-create-table.sql
-        sudo mysql -u githubuser -p'Moseprek12@' my_database < ./02-seed-data.sql
+        sudo mysql -u root -p'Moseprek12@' my_database < ./01-create-table.sql
+
+    # 5. Ekzekuto skriptin për futjen e të dhënave (02-seed-data.sql)
+    - name: Seed Data
+      run: |
+        sudo mysql -u root -p'Moseprek12@' my_database < ./02-seed-data.sql
 
     # 6. Verifikimi i të dhënave
-    - name: Verify Database Setup
+    - name: Verify Data in Table
       run: |
-        sudo mysql -u githubuser -p'Moseprek12@' -e "USE my_database; SELECT * FROM employees;"
+        sudo mysql -u root -p'Moseprek12@' -e "USE my_database; SELECT * FROM employees;"
