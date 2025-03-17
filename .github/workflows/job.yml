@@ -23,12 +23,12 @@ jobs:
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Përdor MySQL root pa password ose me fjalëkalim të caktuar
+    # 3. Vendos password për root dhe krijo bazën e të dhënave
     - name: Set MySQL Root Password and Create Database
       run: |
-        sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('Moseprek12@') WHERE User='root';"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS my_database;"
+        sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Moseprek12@';"
+        sudo mysql -u root -e "FLUSH PRIVILEGES;"
+        sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS my_database;"
 
     # 4. Ekzekuto SQL skriptet për krijimin e tabelave dhe futjen e të dhënave
     - name: Execute SQL Scripts
