@@ -14,12 +14,12 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: ${{ secrets.SQL_PASSWORD }}
           MYSQL_DATABASE: my_database
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -34,7 +34,7 @@ jobs:
       - name: Wait for MySQL to be ready
         run: |
           for i in {30..0}; do
-            if mysqladmin ping -h 127.0.0.1 -u root -proot --silent; then
+            if mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} --silent; then
               break
             fi
             echo 'Waiting for MySQL...'
@@ -43,9 +43,9 @@ jobs:
 
       - name: Run SQL Scripts
         run: |
-          mysql -h 127.0.0.1 -u root -proot my_database < 01-create-table.sql
-          mysql -h 127.0.0.1 -u root -proot my_database < 02-seed-data.sql
+          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} my_database < 01-create-table.sql
+          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} my_database < 02-seed-data.sql
 
       - name: Verify Data
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "USE my_database; SELECT * FROM employees;"
+          mysql -h 127.0.0.1 -u root -p${{ secrets.SQL_PASSWORD }} -e "USE my_database; SELECT * FROM employees;"
