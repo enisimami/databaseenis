@@ -1,4 +1,4 @@
-name: MySQL Setup, Create Table, and Seed Data
+name: MySQL Setup - Create Database, Table, and Seed Data
 
 on:
   push:
@@ -14,31 +14,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # 2. Përditëso Ubuntu dhe instalo MySQL
+    # 2. Instaloni MySQL
     - name: Install MySQL
       run: |
         sudo apt update -y
-        sudo apt upgrade -y
         sudo apt install -y mysql-server mysql-client
         sudo systemctl start mysql
         sudo systemctl enable mysql
 
-    # 3. Krijo bazën e të dhënave 'employees'
+    # 3. Krijoni bazën 'employees' (pa kontrolluar nëse ekziston)
     - name: Create Database
       run: |
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS employees;"
+        sudo mysql -e "CREATE DATABASE employees;"
 
-    # 4. Ekzekuto skriptin për krijimin e tabelës (01-create-table.sql)
+    # 4. Krijoni tabelën 'employees'
     - name: Create Table
       run: |
         sudo mysql -u root -p'Moseprek12@' employees < ./01-create-table.sql
 
-    # 5. Ekzekuto skriptin për futjen e të dhënave (02-seed-data.sql)
+    # 5. Fut të dhënat në tabelën 'employees'
     - name: Seed Data
       run: |
         sudo mysql -u root -p'Moseprek12@' employees < ./02-seed-data.sql
-
-    # 6. Verifikimi i të dhënave
-    - name: Verify Data in Table
-      run: |
-        sudo mysql -u root -p'Moseprek12@' -e "USE employees; SELECT * FROM employees;"
