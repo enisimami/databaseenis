@@ -24,7 +24,8 @@ jobs:
 
     - name: Create MySQL Database
       run: |
-        sudo mysql -u root -e "CREATE DATABASE employees;"
+        sudo mysql -u root -p
+        CREATE DATABASE employees;
 
     - name: Create table in the database
       run: |
