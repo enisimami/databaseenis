@@ -18,12 +18,14 @@ jobs:
         sudo apt update
         sudo apt install -y mysql-server
 
+    - name: Start MySQL Service
+      run: |
+        sudo service mysql start
+
     - name: Create MySQL Database
       run: |
-        sudo mysql -u root -p
-        CREATE DATABASE employees;
-        USE employees;
-        
+        sudo mysql -e "CREATE DATABASE employees;"
+
     - name: Create table in the database
       run: |
         sudo mysql -e "USE employees; CREATE TABLE IF NOT EXISTS employees (
