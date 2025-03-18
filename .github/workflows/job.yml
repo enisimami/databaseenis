@@ -1,4 +1,4 @@
-name: MySQL Database Creation
+name: MySQL Database Setup
 
 on:
   push:
@@ -18,30 +18,19 @@ jobs:
         sudo apt update
         sudo apt install -y mysql-server
 
-    - name: Start MySQL service
+    - name: Start MySQL Service
       run: |
         sudo systemctl start mysql
+        sudo systemctl enable mysql
 
     - name: Create MySQL Database
       run: |
-        CREATE DATABASE employees;
+        sudo mysql -u root -e "CREATE DATABASE employees;"
 
-    - name: Create table in the database
+    - name: Create Table in the Database
       run: |
-        sudo mysql -u root -e
-        USE employees; CREATE TABLE IF NOT EXISTS employees (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name VARCHAR(100),
-          role VARCHAR(50),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+        sudo mysql -u root employees < 01-create-table.sql
 
-    - name: Seed data into the database
+    - name: Seed Data into the Database
       run: |
-        sudo mysql -u root -e "USE employees; INSERT INTO employees (name, role) VALUES
-        ('Altin', 'DevOps Engineer'),
-        ('Enis', 'Developer');"
-
-    - name: Stop MySQL service
-      run: |
-        sudo systemctl stop mysql
+        sudo mysql -u root employees < 02-seed-data.sql
