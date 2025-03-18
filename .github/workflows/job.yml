@@ -18,6 +18,9 @@ jobs:
         sudo apt update
         sudo apt install -y mysql-server
 
+    - name: Stop MySQL Service
+      run: sudo systemctl stop mysql
+
     - name: Start MySQL Service
       run: |
         sudo systemctl start mysql
@@ -25,12 +28,12 @@ jobs:
 
     - name: Create MySQL Database
       run: |
-        sudo mysql -u root -e "CREATE DATABASE employees;"
+        sudo mysql -e "CREATE DATABASE employees;"
 
     - name: Create Table in the Database
       run: |
-        sudo mysql -u root employees < 01-create-table.sql
+        sudo mysql employees < 01-create-table.sql
 
     - name: Seed Data into the Database
       run: |
-        sudo mysql -u root employees < 02-seed-data.sql
+        sudo mysql employees < 02-seed-data.sql
